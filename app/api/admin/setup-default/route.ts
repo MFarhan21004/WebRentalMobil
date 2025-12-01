@@ -5,28 +5,28 @@ export async function POST() {
   try {
     const supabase = createServerClient()
 
-    // Check if default admin already exists
+    // Cek apakah admin sudah ada (menggunakan email baru)
     const { data: existingAdmin } = await supabase
       .from("admin_profiles")
       .select("id")
-      .eq("email", "admin@17rentcar.com")
+      .eq("email", "muhammadfarhan21004@gmail.com")
       .single()
 
     if (existingAdmin) {
       return NextResponse.json({
         success: true,
-        message: "Default admin already exists",
-        email: "admin@17rentcar.com",
+        message: "Super admin already exists",
+        email: "muhammadfarhan21004@gmail.com",
       })
     }
 
-    // Create default admin user
+    // Buat user baru di Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: "admin@17rentcar.com",
-      password: "admin123456", // You should change this immediately
+      email: "muhammadfarhan21004@gmail.com",
+      password: "RentalFarhan21004",
       email_confirm: true,
       user_metadata: {
-        full_name: "Super Admin",
+        full_name: "Super Admin", // Bisa diubah jadi "Muhammad Farhan" jika mau
       },
     })
 
@@ -34,7 +34,7 @@ export async function POST() {
       return NextResponse.json({ error: "Failed to create default admin", details: authError.message }, { status: 400 })
     }
 
-    // Create admin profile with full permissions
+    // Buat profile admin dengan akses penuh (Super Admin)
     const { error: profileError } = await supabase.from("admin_profiles").insert({
       id: authData.user.id,
       email: authData.user.email,
@@ -51,7 +51,7 @@ export async function POST() {
     })
 
     if (profileError) {
-      // If profile creation fails, delete the auth user
+      // Jika pembuatan profile gagal, hapus user auth agar tidak nyangkut
       await supabase.auth.admin.deleteUser(authData.user.id)
       return NextResponse.json(
         { error: "Failed to create admin profile", details: profileError.message },
@@ -62,8 +62,8 @@ export async function POST() {
     return NextResponse.json({
       success: true,
       message: "Default admin created successfully",
-      email: "admin@17rentcar.com",
-      password: "admin123456",
+      email: "muhammadfarhan21004@gmail.com",
+      password: "RentalFarhan21004",
       note: "Please change the password immediately after first login",
     })
   } catch (error) {
